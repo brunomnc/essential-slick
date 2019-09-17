@@ -78,5 +78,36 @@ object Example extends App {
     println(" With a value: "+query(Some("Dave")).result.statements.mkString)
     println(" Without a value: "+query(None).result.statements.mkString)
 
+    println("\n Number of messages sent:")
+    val result = exec( messages.result )
+    println(result.length)
+
+    println("\n Find the message with ID 1:")
+    exec( messages.filter(_.id === 1L).result ) foreach { println }
+
+    println("\n Is HAL real?")
+    val hasHAL = for { m <- messages if m.content like "%HAL%" } yield m
+    println( exec( hasHAL.exists.result ) )
+
+    println("\n Just content columns")
+    val justOneColumn = for { m <- messages } yield m.content
+    exec( justOneColumn.result ) foreach { println }
+
+    println("\n First result")
+    val firstHALMessage = for { m <- messages if m.sender === "HAL" } yield m
+    println( exec( firstHALMessage.result.head ) )
+
+    println("\n Then the rest")
+    val restOfHALMessages = for { m <- messages if m.sender === "HAL" } yield m
+    exec( restOfHALMessages.take(5).result ) foreach { println }
+
+    println("\n The start of something")
+    val startsWithMessage = for { m <- messages if m.content.startsWith("Open") } yield m
+    exec( startsWithMessage.result ) foreach { println }
+
+    println("\n Liking")
+    val liking = for { m <- messages if m.content like "%do%"} yield m.content
+    exec( liking.result ) foreach { println }
+
   } finally db.close
 }

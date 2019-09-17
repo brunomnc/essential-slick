@@ -54,8 +54,22 @@ object Example extends App {
 
   // Run the test query and print the results:
   println("\nSelecting all messages:")
+  println(messages.result.statements.mkString)
   exec( messages.result ) foreach { println }
 
   println("\nSelecting only messages from HAL:")
   exec( halSays.result ) foreach { println }
+
+  println("\nSelecting ID from HALs messages")
+  exec( halSays.map(_.id).result ) foreach { println }
+
+  println("\n 1.6 - Bring your own data - 1")
+  val newMessage = Message("Dave","What if I say 'Pretty please'?")
+  exec( messages += newMessage )
+  exec( messages.result ) foreach { println }
+
+  println("\n 1.6 - Bring your own data - 2")
+  val daveSays = messages.filter(_.sender === "Dave")
+  exec( daveSays.result ) foreach { println }
+
 }
